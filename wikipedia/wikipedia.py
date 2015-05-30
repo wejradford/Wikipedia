@@ -299,7 +299,7 @@ class WikipediaPage(object):
     self.__load(redirect=redirect, preload=preload)
 
     if preload:
-      for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
+      for prop in ('content', 'summary', 'images', 'references', 'links', 'sections', 'redirects'):
         getattr(self, prop)
 
   def __repr__(self):
@@ -675,6 +675,19 @@ class WikipediaPage(object):
 
     return self.content[index:next_index].lstrip("=").strip()
 
+  @property
+  def redirects(self):
+    '''
+    List of redirects for a page.
+    '''
+    if not getattr(self, '_redirects', False):
+      self._redirects = [link['title']
+        for link in self.__continued_query({
+          'prop': 'redirects',
+        })
+      ]
+
+    return self._redirects
 
 @cache
 def languages():
